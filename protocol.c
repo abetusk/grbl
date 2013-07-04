@@ -32,6 +32,11 @@
 #include "report.h"
 #include "motion_control.h"
 
+//-------------------- EXPERIMENTAL --------------------
+#include "probe.h"
+//-------------------- EXPERIMENTAL --------------------
+
+
 static char line[LINE_BUFFER_SIZE]; // Line to be executed. Zero-terminated.
 static uint8_t char_counter; // Last character counter in line variable.
 static uint8_t iscomment; // Comment/block delete flag for processor to ignore comment characters.
@@ -232,6 +237,25 @@ uint8_t protocol_execute_line(char *line)
           } else { return(STATUS_IDLE_ERROR); }
         } else { return(STATUS_SETTING_DISABLED); }
         break;
+
+     // ------------- EXPERIMENTAL -----------------
+     case 'P' : // Perform probe cycle
+       if ( sys.state==STATE_IDLE ) {
+         // paranoia, make sure user explicitely enables probing
+         if ( settings.probe_enabled ) {
+           mc_probe(); 
+         } else { return(STATUS_SETTING_DISABLED); }
+       } else { return(STATUS_IDLE_ERROR); }
+       break;
+
+     case 'S':
+       if ( line[++char_counter] != 0 ) { return(STATUS_UNSUPPORTED_STATEMENT); }
+       else { report_probe_state(); }
+       break;
+
+     // ------------- EXPERIMENTAL -----------------
+
+
 //    case 'J' : break;  // Jogging methods
       // TODO: Here jogging can be placed for execution as a seperate subprogram. It does not need to be 
       // susceptible to other runtime commands except for e-stop. The jogging function is intended to

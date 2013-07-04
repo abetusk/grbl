@@ -28,6 +28,10 @@
 #include "eeprom.h"
 #include "limits.h"
 
+//------------------ EXPERIMENTAL ----------------
+#include "probe.h"
+//------------------ EXPERIMENTAL ----------------
+
 settings_t settings;
 
 // Version 4 outdated settings record
@@ -95,6 +99,14 @@ void settings_reset(bool reset_all) {
   settings.stepper_idle_lock_time = DEFAULT_STEPPER_IDLE_LOCK_TIME;
   settings.decimal_places = DEFAULT_DECIMAL_PLACES;
   settings.n_arc_correction = DEFAULT_N_ARC_CORRECTION;
+
+  //------------------ EXPERIMENTAL --------------------
+  settings.probe_feed_rate = DEFAULT_PROBE_FEEDRATE;
+  settings.probe_acceleration = DEFAULT_PROBE_ACCELERATION;
+  settings.probe_z_threshold = DEFAULT_PROBE_Z_THRESHOLD;
+  settings.probe_enabled = DEFAULT_PROBE_ENABLE;
+  //------------------ EXPERIMENTAL --------------------
+
   write_global_settings();
 }
 
@@ -195,6 +207,25 @@ uint8_t settings_store_global_setting(int parameter, float value) {
     case 20: settings.homing_seek_rate = value; break;
     case 21: settings.homing_debounce_delay = round(value); break;
     case 22: settings.homing_pulloff = value; break;
+
+    //------------------ EXPERIMENTAL --------------------
+    case 23: settings.probe_feed_rate = value; break;
+    case 24: settings.probe_acceleration = value*60*60; break;
+    case 25: settings.probe_z_threshold = value; break;
+    case 26: 
+      if (trunc(value))
+      {
+        settings.probe_enabled = 1;
+        probe_enable();
+      }
+      else
+      {
+        settings.probe_enabled = 0;
+        probe_disable();
+      }
+      break;
+    //------------------ EXPERIMENTAL --------------------
+
     default: 
       return(STATUS_INVALID_STATEMENT);
   }

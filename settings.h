@@ -74,6 +74,14 @@ typedef struct {
   uint8_t stepper_idle_lock_time; // If max value 255, steppers do not disable.
   uint8_t decimal_places;
   uint8_t n_arc_correction;
+
+  //---------------- EXPERIMENTAL --------------------
+  float probe_feed_rate;
+  float probe_acceleration;
+  float probe_z_threshold;
+  uint8_t probe_enabled;
+  //---------------- EXPERIMENTAL --------------------
+
 //  uint8_t status_report_mask; // Mask to indicate desired report data.
 } settings_t;
 extern settings_t settings;

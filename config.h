@@ -34,12 +34,24 @@
 // NOTE: All step bit and direction pins must be on the same port.
 #define STEPPING_DDR       DDRD
 #define STEPPING_PORT      PORTD
-#define X_STEP_BIT         2  // Uno Digital Pin 2
-#define Y_STEP_BIT         3  // Uno Digital Pin 3
-#define Z_STEP_BIT         4  // Uno Digital Pin 4
-#define X_DIRECTION_BIT    5  // Uno Digital Pin 5
-#define Y_DIRECTION_BIT    6  // Uno Digital Pin 6
-#define Z_DIRECTION_BIT    7  // Uno Digital Pin 7
+
+
+//#define X_STEP_BIT         2  // Uno Digital Pin 2
+//#define Y_STEP_BIT         3  // Uno Digital Pin 3
+//#define Z_STEP_BIT         4  // Uno Digital Pin 4
+//#define X_DIRECTION_BIT    5  // Uno Digital Pin 5
+//#define Y_DIRECTION_BIT    6  // Uno Digital Pin 6
+//#define Z_DIRECTION_BIT    7  // Uno Digital Pin 7
+
+
+#define X_DIRECTION_BIT    2  // Uno Digital Pin 5
+#define X_STEP_BIT         3  // Uno Digital Pin 2
+#define Y_DIRECTION_BIT    4  // Uno Digital Pin 6
+#define Y_STEP_BIT         5  // Uno Digital Pin 3
+#define Z_DIRECTION_BIT    6  // Uno Digital Pin 7
+#define Z_STEP_BIT         7  // Uno Digital Pin 4
+
+
 #define STEP_MASK ((1<<X_STEP_BIT)|(1<<Y_STEP_BIT)|(1<<Z_STEP_BIT)) // All step bits
 #define DIRECTION_MASK ((1<<X_DIRECTION_BIT)|(1<<Y_DIRECTION_BIT)|(1<<Z_DIRECTION_BIT)) // All direction bits
 #define STEPPING_MASK (STEP_MASK | DIRECTION_MASK) // All stepping-related bits (step/direction)
@@ -93,6 +105,15 @@
 #define PINOUT_INT_vect  PCINT1_vect
 #define PINOUT_PCMSK     PCMSK1 // Pin change interrupt register
 #define PINOUT_MASK ((1<<PIN_RESET)|(1<<PIN_FEED_HOLD)|(1<<PIN_CYCLE_START))
+
+//----------------- EXPERIMENTAL ------------------
+// Port and pins for the probe functionality.
+#define PROBE_DDR           DDRC
+#define PROBE_PIN           PINC
+#define PROBE_PORT          PORTC
+#define PROBE_BIT           5 // Uno Analog Pin 5
+//----------------- EXPERIMENTAL ------------------
+ 
 
 // Define runtime command special characters. These characters are 'picked-off' directly from the
 // serial read data stream and are not passed to the grbl line execution parser. Select characters
@@ -170,6 +191,8 @@
 // be stored and executed in order. These startup blocks would typically be used to set the g-code
 // parser state depending on user preferences.
 #define N_STARTUP_LINE 2 // Integer (1-5)
+
+
 
 // ---------------------------------------------------------------------------------------
 // FOR ADVANCED USERS ONLY: 

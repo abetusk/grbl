@@ -37,6 +37,7 @@
 #define STATUS_ALARM_LOCK 12
 #define STATUS_OVERFLOW 13
 
+
 // Define Grbl alarm codes. Less than zero to distinguish alarm error from status error.
 #define ALARM_HARD_LIMIT -1
 #define ALARM_ABORT_CYCLE -2
@@ -77,5 +78,10 @@ void report_gcode_modes();
 
 // Prints startup line
 void report_startup_line(uint8_t n, char *line);
+
+//----------------- EXPERIMENTAL --------------
+// Prints probe's state (whether it's in contact or not, the contact point and current probe position)
+void report_probe_state();
+//----------------- EXPERIMENTAL --------------
 
 #endif

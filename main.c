@@ -39,6 +39,10 @@
 #include "settings.h"
 #include "serial.h"
 
+//------------------ EXPERIMENTAL ---------------------
+#include "probe.h"
+//------------------ EXPERIMENTAL ---------------------
+
 // Declare system global variable structure
 system_t sys; 
 
@@ -68,6 +72,11 @@ int main(void)
       spindle_init();
       coolant_init();
       limits_init();
+
+      //-------------- EXPERIMENTAL ---------------------
+      probe_init();
+      //-------------- EXPERIMENTAL ---------------------
+
       st_reset(); // Clear stepper subsystem variables.
 
       // Sync cleared gcode and planner positions to current system position, which is only

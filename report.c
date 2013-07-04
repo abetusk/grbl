@@ -76,6 +76,7 @@ void report_status_message(uint8_t status_code)
       printPgmString(PSTR("Alarm lock")); break;
       case STATUS_OVERFLOW:
       printPgmString(PSTR("Line overflow")); break;
+
     }
     printPgmString(PSTR("\r\n"));
   }
@@ -137,11 +138,68 @@ void report_grbl_help() {
                       "$C (check gcode mode)\r\n"
                       "$X (kill alarm lock)\r\n"
                       "$H (run homing cycle)\r\n"
+
+                      //---------------- EXPERIMENTAL -------------------
+                      "$P (run z probe)\r\n"
+                      "$S (view probe state)\r\n"
+                      //---------------- EXPERIMENTAL -------------------
+
                       "~ (cycle start)\r\n"
                       "! (feed hold)\r\n"
                       "? (current status)\r\n"
                       "ctrl-x (reset Grbl)\r\n"));
 }
+
+//---------------- EXPERIMENTAL -------------------
+
+void report_probe_state() {
+  float x;
+
+  printPgmString(PSTR("[probe:")); 
+  if (settings.probe_enabled)
+    printPgmString(PSTR("on,"));
+  else
+    printPgmString(PSTR("off,"));
+
+  if (!settings.probe_enabled)
+  {
+    printPgmString(PSTR("-,state:-")); 
+  }
+  else
+  {
+    if (PROBE_PIN & (1 << PROBE_BIT))
+    {
+      printPgmString(PSTR("^,state:")); 
+      printPgmString(PSTR("apart"));
+    }
+    else
+    {
+      printPgmString(PSTR("_,state:")); 
+      printPgmString(PSTR("contact"));   // contact low
+    }
+  }
+
+  printPgmString(PSTR(",contact_z:")); 
+
+  x = sys.probe_z_contact_position / settings.steps_per_mm[Z_AXIS];
+  printFloat(x);
+
+  printPgmString(PSTR(",position_z:")); 
+  x = sys.position[Z_AXIS] / settings.steps_per_mm[Z_AXIS];
+  printFloat(x);
+
+
+  //DEBUG
+  printPgmString(PSTR(",position_z_raw:")); 
+  printInteger( sys.position[Z_AXIS] );
+  //DEBUG
+
+  printPgmString(PSTR("]\r\n")); 
+
+}
+
+//---------------- EXPERIMENTAL -------------------
+
 
 // Grbl global settings print out.
 // NOTE: The numbering scheme here must correlate to storing in settings.c
@@ -172,6 +230,25 @@ void report_grbl_settings() {
   printPgmString(PSTR(" (homing seek, mm/min)\r\n$21=")); printInteger(settings.homing_debounce_delay);
   printPgmString(PSTR(" (homing debounce, msec)\r\n$22=")); printFloat(settings.homing_pulloff);
   printPgmString(PSTR(" (homing pull-off, mm)\r\n")); 
+
+  //------------------ EXPERIMENTAL ------------------
+  printPgmString(PSTR("$23=")); 
+  printFloat(settings.probe_feed_rate);
+  printPgmString(PSTR(" (probe feed rate)\r\n"));
+
+  printPgmString(PSTR("$24="));
+  printFloat(settings.probe_acceleration/(60*60));
+  printPgmString(PSTR(" (probe acceleration, mm/sec^2)\r\n"));
+
+  printPgmString(PSTR("$25="));
+  printInteger(settings.probe_z_threshold);
+  printPgmString(PSTR(" (probe z threshold)\r\n"));
+
+  printPgmString(PSTR("$26=")); 
+  printInteger(settings.probe_enabled);
+  printPgmString(PSTR(" (probe enabled flag)\r\n"));
+  //------------------ EXPERIMENTAL ------------------
+
 }
 
 
@@ -306,7 +383,24 @@ void report_realtime_status()
     case STATE_HOMING: printPgmString(PSTR("<Home")); break;
     case STATE_ALARM: printPgmString(PSTR("<Alarm")); break;
     case STATE_CHECK_MODE: printPgmString(PSTR("<Check")); break;
+
+    //--------------------- EXPERIMENTAL ---------------------
+    case STATE_PROBE: printPgmString(PSTR("<Probe"));  break;
+    //--------------------- EXPERIMENTAL ---------------------
+
+
   }
+
+  //--------------------- EXPERIMENTAL ---------------------
+  /*
+  if ( PROBE_PIN & (1 << PROBE_BIT) )
+    printPgmString(PSTR("*")); 
+  else
+    printPgmString(PSTR(".")); 
+  if (settings.probe_enabled)
+    printPgmString(PSTR("+"));
+    */
+  //--------------------- EXPERIMENTAL ---------------------
  
   // Report machine position
   printPgmString(PSTR(",MPos:")); 

@@ -36,6 +36,10 @@
 #include "limits.h"
 #include "protocol.h"
 
+//----------- EXPERIMENTAL --------------
+#include "probe.h"
+//----------- EXPERIMENTAL --------------
+
 // Execute linear motion in absolute millimeter coordinates. Feed rate given in millimeters/second
 // unless invert_feed_rate is true. Then the feed_rate means that the motion should be completed in
 // (1 minute)/feed_rate time.
@@ -257,6 +261,35 @@ void mc_go_home()
   if (bit_istrue(settings.flags,BITFLAG_HARD_LIMIT_ENABLE)) { LIMIT_PCMSK |= LIMIT_MASK; }
   // Finished! 
 }
+
+//--------------------- EXPERIMENTAL ---------------------------
+void mc_probe()
+{
+  plan_synchronize();
+  sys_sync_current_position();
+
+  sys.state = STATE_PROBE; // Set system state variable
+
+  probe_z(settings.probe_z_threshold, settings.probe_feed_rate, settings.probe_acceleration);   // Perform probe 
+
+  protocol_execute_runtime();   // Check for reset and set system abort.
+  if (sys.abort) { return; }    // Did not complete. Alarm state set by mc_alarm.
+
+  // After probe_z, and assuming nothing else happened, the axis
+  // should be in a state that's just touching.
+  // Syncrhonize current position since we've circumvented stepper subsystem.
+  // We can't back off since the user needs this information at a higher level.
+  sys_sync_current_position();
+  sys.state = STATE_IDLE;
+
+
+  plan_synchronize();
+  sys_sync_current_position();
+
+
+}
+
+//--------------------- EXPERIMENTAL ---------------------------
 
 
 // Method to ready the system to reset by setting the runtime reset command and killing any

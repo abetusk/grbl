@@ -80,6 +80,10 @@
 #define STATE_CHECK_MODE 7 // G-code check mode. Locks out planner and motion only.
 // #define STATE_JOG     8 // Jogging mode is unique like homing.
 
+//---------------------- EXPERIMENTAL --------------
+#define STATE_PROBE      9 // Performing probing
+//---------------------- EXPERIMENTAL --------------
+
 // Define global system variables
 typedef struct {
   uint8_t abort;                 // System abort flag. Forces exit back to main loop for reset.
@@ -88,6 +92,11 @@ typedef struct {
   int32_t position[N_AXIS];      // Real-time machine (aka home) position vector in steps. 
                                  // NOTE: This may need to be a volatile variable, if problems arise.   
   uint8_t auto_start;            // Planner auto-start flag. Toggled off during feed hold. Defaulted by settings.
+
+  //---------------------- EXPERIMENTAL --------------
+  int32_t probe_z_contact_position; // recorded position where probe hit
+  //---------------------- EXPERIMENTAL --------------
+
 } system_t;
 extern system_t sys;
 

@@ -43,8 +43,14 @@
 
 void probe_init(void)
 {
+
+  sys.pulse_counter[X_AXIS] = 0;
+  sys.pulse_counter[Y_AXIS] = 0;
+  sys.pulse_counter[Z_AXIS] = 0;
+
   sys.probe_z_contact_position = 0.0;
   probe_disable();
+
 }
 
 void probe_enable(void)
@@ -143,6 +149,124 @@ void probe_z(float z_limit, float probe_rate, float probe_acceleration)
 
   // record position
   sys.probe_z_contact_position = sys.position[Z_AXIS];
+
+  st_go_idle();
+
+}
+
+
+// probe z and return to original position
+//
+void probe_z_and_return(float z_limit, float probe_rate, float probe_acceleration)
+{
+  uint32_t steps[3];
+
+  // For simplicity, keep the bit vectors for Z direction in variables
+  uint8_t out_bits, out_bits_orig;
+
+  // calculate nominal rate, time delay for the nominal rate (stored in dt)
+  // and the actual step delay (stored in step_delay, taking into account
+  // the pulse duration)
+  uint32_t nominal_rate = ceil( settings.steps_per_mm[Z_AXIS] * probe_rate ) ;
+  uint32_t dt = 1000000*60 / nominal_rate ; 
+  uint32_t step_delay = dt-settings.pulse_microseconds;  // Step delay after pulse
+
+  uint8_t debounce_count;
+  int32_t z_limit_step = lround( z_limit * settings.steps_per_mm[Z_AXIS] );
+
+  // enable only stepper subsystem
+  st_wake_up();
+
+  steps[Z_AXIS] = lround(settings.steps_per_mm[Z_AXIS]);
+
+  // go in negative z direction
+  out_bits_orig = settings.invert_mask ^ (1<<Z_DIRECTION_BIT);
+  out_bits      = out_bits_orig        ^ (1<< Z_STEP_BIT);
+
+  int orig_z_position = sys.position[Z_AXIS];
+  
+  for (;;)
+  {
+
+
+    // stop if we've reached the limit
+    if ( sys.position[Z_AXIS] <= z_limit_step )
+      break;
+
+    #ifdef PROBE_DEBOUNCE_COUNT
+    // poor mans debouncing
+    for (debounce_count = 0; debounce_count < PROBE_DEBOUNCE_COUNT; debounce_count++)
+    {
+    #endif
+
+      if (sys.execute & EXEC_RESET) break;
+      if (PROBE_PIN & (1 << PROBE_BIT)) 
+        break;
+      #ifdef PROBE_DEBOUNCE_WAIT
+      delay_us(PROBE_DEBOUNCE_WAIT);
+      #endif
+
+    #ifdef PROBE_DEBOUNCE_COUNT
+    }
+    #endif
+
+    // if we've entered a reset or if our probe has hit something, break
+    if (sys.execute & EXEC_RESET) break;
+    if (debounce_count == PROBE_DEBOUNCE_COUNT) break;
+
+    // Perform step.
+    STEPPING_PORT = out_bits;
+    delay_us(settings.pulse_microseconds);
+    STEPPING_PORT = out_bits_orig;
+    delay_us(step_delay);
+
+    sys.position[Z_AXIS]--;
+
+  }
+
+
+  // record position
+  sys.probe_z_contact_position = sys.position[Z_AXIS];
+
+  // bail out if we're in a reset
+  if (sys.execute & EXEC_RESET) 
+  {
+    st_go_idle();
+    return;
+  }
+
+  // let it settle down before going back up
+  delay_us(step_delay);
+  delay_us(step_delay);
+  delay_us(step_delay);
+  delay_us(step_delay);
+
+  // go in the other direction
+  out_bits_orig ^= (1<<Z_DIRECTION_BIT);
+  out_bits      = out_bits_orig ^ (1<< Z_STEP_BIT);
+
+  // return to original position
+  for (;;)
+  {
+    if (sys.position[Z_AXIS] == orig_z_position) 
+      break;
+
+    // if we've entered a reset, break
+    if (sys.execute & EXEC_RESET) break;
+
+    // Perform step.
+    STEPPING_PORT = out_bits;
+    delay_us(settings.pulse_microseconds);
+    STEPPING_PORT = out_bits_orig;
+    delay_us(step_delay);
+
+    sys.position[Z_AXIS]++;
+
+  }
+
+  // Whether we've entered a reset condition or not, 
+  // we sill want to just record position, put the
+  // stepper subsystem back into idle, and return.
 
   st_go_idle();
 

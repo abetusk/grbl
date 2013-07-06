@@ -95,6 +95,8 @@ typedef struct {
 
   //---------------------- EXPERIMENTAL --------------
   int32_t probe_z_contact_position; // recorded position where probe hit
+
+  uint32_t pulse_counter[N_AXIS];
   //---------------------- EXPERIMENTAL --------------
 
 } system_t;

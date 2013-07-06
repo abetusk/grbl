@@ -80,6 +80,7 @@ typedef struct {
   float probe_acceleration;
   float probe_z_threshold;
   uint8_t probe_enabled;
+
   //---------------- EXPERIMENTAL --------------------
 
 //  uint8_t status_report_mask; // Mask to indicate desired report data.

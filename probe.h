@@ -33,4 +33,6 @@ void probe_disable(void);
 
 void probe_z(float, float, float);
 
+void probe_z_and_return(float, float, float);
+
 #endif

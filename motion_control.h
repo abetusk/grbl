@@ -46,4 +46,6 @@ void mc_go_home();
 // Performs system reset. If in motion state, kills all motion and sets system alarm.
 void mc_reset();
 
+void mc_probe(void);
+
 #endif

@@ -153,6 +153,7 @@ void report_grbl_help() {
 //---------------- EXPERIMENTAL -------------------
 
 void report_probe_state() {
+  int i;
   float x;
 
   printPgmString(PSTR("[probe:")); 
@@ -184,6 +185,9 @@ void report_probe_state() {
   x = sys.probe_z_contact_position / settings.steps_per_mm[Z_AXIS];
   printFloat(x);
 
+  printPgmString(PSTR(",contact_z_raw:")); 
+  printInteger( sys.probe_z_contact_position );
+
   printPgmString(PSTR(",position_z:")); 
   x = sys.position[Z_AXIS] / settings.steps_per_mm[Z_AXIS];
   printFloat(x);
@@ -192,6 +196,14 @@ void report_probe_state() {
   //DEBUG
   printPgmString(PSTR(",position_z_raw:")); 
   printInteger( sys.position[Z_AXIS] );
+
+  printPgmString(PSTR(",pulse_counter(X;Y;Z):(")); 
+  printInteger( sys.pulse_counter[X_AXIS] );
+  printPgmString(PSTR(";")); 
+  printInteger( sys.pulse_counter[Y_AXIS] );
+  printPgmString(PSTR(";")); 
+  printInteger( sys.pulse_counter[Z_AXIS] );
+  printPgmString(PSTR(")")); 
   //DEBUG
 
   printPgmString(PSTR("]\r\n")); 

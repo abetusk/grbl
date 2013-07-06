@@ -270,7 +270,8 @@ void mc_probe()
 
   sys.state = STATE_PROBE; // Set system state variable
 
-  probe_z(settings.probe_z_threshold, settings.probe_feed_rate, settings.probe_acceleration);   // Perform probe 
+  //probe_z(settings.probe_z_threshold, settings.probe_feed_rate, settings.probe_acceleration);   // Perform probe 
+  probe_z_and_return(settings.probe_z_threshold, settings.probe_feed_rate, settings.probe_acceleration);   // Perform probe 
 
   protocol_execute_runtime();   // Check for reset and set system abort.
   if (sys.abort) { return; }    // Did not complete. Alarm state set by mc_alarm.

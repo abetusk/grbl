@@ -25,7 +25,8 @@
 // IMPORTANT: Any changes here requires a full re-compiling of the source code to propagate them.
 
 // Default settings. Used when resetting EEPROM. Change to desired name in defaults.h
-#define DEFAULTS_GENERIC
+//#define DEFAULTS_GENERIC
+#define DEFAULTS_ZEN_TOOLWORKS_7x7_PCB
 
 // Serial baud rate
 #define BAUD_RATE 9600

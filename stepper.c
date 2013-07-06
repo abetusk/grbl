@@ -199,6 +199,11 @@ ISR(TIMER1_COMPA_vect)
       st.counter_x -= st.event_count;
       if (out_bits & (1<<X_DIRECTION_BIT)) { sys.position[X_AXIS]--; }
       else { sys.position[X_AXIS]++; }
+
+      //----- EXPERIMENTAL -----
+      sys.pulse_counter[X_AXIS]++;
+      //----- EXPERIMENTAL -----
+
     }
     st.counter_y += current_block->steps_y;
     if (st.counter_y > 0) {
@@ -206,6 +211,11 @@ ISR(TIMER1_COMPA_vect)
       st.counter_y -= st.event_count;
       if (out_bits & (1<<Y_DIRECTION_BIT)) { sys.position[Y_AXIS]--; }
       else { sys.position[Y_AXIS]++; }
+
+      //----- EXPERIMENTAL -----
+      sys.pulse_counter[Y_AXIS]++;
+      //----- EXPERIMENTAL -----
+
     }
     st.counter_z += current_block->steps_z;
     if (st.counter_z > 0) {
@@ -213,6 +223,11 @@ ISR(TIMER1_COMPA_vect)
       st.counter_z -= st.event_count;
       if (out_bits & (1<<Z_DIRECTION_BIT)) { sys.position[Z_AXIS]--; }
       else { sys.position[Z_AXIS]++; }
+
+      //----- EXPERIMENTAL -----
+      sys.pulse_counter[Z_AXIS]++;
+      //----- EXPERIMENTAL -----
+
     }
     
     st.step_events_completed++; // Iterate step events
@@ -414,6 +429,7 @@ static uint32_t config_step_timer(uint32_t cycles)
   TCCR1B = (TCCR1B & ~(0x07<<CS10)) | (prescaler<<CS10);
   // Set ceiling
   OCR1A = ceiling;
+
   return(actual_cycles);
 }
 

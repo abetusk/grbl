@@ -183,7 +183,7 @@ void probe_z_and_return(float z_limit, float probe_rate, float probe_acceleratio
   out_bits_orig = settings.invert_mask ^ (1<<Z_DIRECTION_BIT);
   out_bits      = out_bits_orig        ^ (1<< Z_STEP_BIT);
 
-  int orig_z_position = sys.position[Z_AXIS];
+  int32_t orig_z_position = sys.position[Z_AXIS];
   
   for (;;)
   {
